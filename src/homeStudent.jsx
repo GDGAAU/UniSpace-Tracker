@@ -3,7 +3,7 @@ import './index.css';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Bubbles from './Bubbles.js';
 
-function Home() {
+function HomeStudent() {
 
     return(
         <div class="welcome-container">
@@ -14,10 +14,7 @@ function Home() {
                                         <Link to="/home">Home</Link>
                                     </li>
                                     <li>
-                                        <Link to="/class">Class Status</Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/schedule">Class Queue</Link>
+                                        <Link to="/classStudent">Class Status</Link>
                                     </li>
                                 </ul>
                             </nav>
@@ -30,12 +27,7 @@ function Home() {
             <div class="feature-card">
                 <h3>Check Availability</h3>
                 <p>See real-time room schedules</p>
-                <a href="http://localhost:3000/class" class="btn">View Status</a>
-            </div>
-            <div class="feature-card">
-                <h3>Join Queue</h3>
-                <p>Reserve class spaces</p>
-                <Link to="/schedule" class="btn">Get Started</Link>
+                <a href="http://localhost:3000/classStudent" class="btn">View Status</a>
             </div>
         </div>
     </div>
@@ -43,4 +35,4 @@ function Home() {
 
     )
 }
-export default Home
+export default HomeStudent

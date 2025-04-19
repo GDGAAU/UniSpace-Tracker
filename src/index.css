@@ -290,7 +290,8 @@ nav ul li a:hover {
     color:white;
   }
   .schedule-container {
-    display: flex; /* Enables flexbox for side-by-side layout */
+    display: flex;
+ /* Enables flexbox for side-by-side layout */
     justify-content:space-around; /* Optional: Spaces sections evenly */
     padding: 20px; /* Optional: Adds space inside the container */
   }
@@ -301,10 +302,24 @@ nav ul li a:hover {
   }
   .card-header {
     display: flex;
-    flex-direction: column;
+     width:60%;
     padding:auto 0px;
     margin:0;
   }
+  .class-half-container{
+    display:flex;
+  }
+  .Block-dropdown,
+.Floor-dropdown,
+.Room-dropdown {
+    padding: 10px; 
+    font-size: 16px;
+    width:150px;
+    height:50px;
+    border: 1px solid #B7B3FF; 
+    background-color:#B7B3FF;
+    border-radius: 4px;
+}
   .card-header h2 {
     margin-left:-160px;
   }
@@ -314,6 +329,7 @@ nav ul li a:hover {
     background-color: #EB1313;
     border-radius: 10px;
     margin-left:50px;
+    display: block;
   }
   
   .card-queue {
