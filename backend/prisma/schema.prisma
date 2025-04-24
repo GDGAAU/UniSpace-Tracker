@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  REPRESENTATIVE
+  ADMIN // Added Admin role
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  email        String        // Added email
+  password     String
+  role         Role          @default(STUDENT)
+  reservations Reservation[]
+  createdAt    DateTime      @default(now()) // Added createdAt
+
+  @@map("users")
+}
+
+model Building {
+  id         Int          @id @default(autoincrement())
+  name       String
+  floorId    Int          // Foreign Key
+  floor      Floor        @relation(fields: [floorId], references: [id])
+  status     String?      //  Nullable status
+  createdAt  DateTime     @default(now())
+  classrooms Classroom[]
+
+  @@map("buildings")
+}
+
+model Floor {
+  id         Int          @id @default(autoincrement())
+  name       String
+  createdAt  DateTime     @default(now())
+  buildings  Building[]
+  classrooms Classroom[]
+
+  @@map("floors")
+}
+
+model Classroom {
+  id         Int          @id @default(autoincrement())
+  floorId    Int          // Foreign Key
+  floor      Floor        @relation(fields: [floorId], references: [id])
+  buildingId Int          // Foreign Key
+  building   Building     @relation(fields: [buildingId], references: [id])
+  name       String
+  createdAt  DateTime     @default(now())
+  reservations Reservation[]
+
+  @@map("classrooms")
+}
+
+model Reservation {
+  id          Int       @id @default(autoincrement())
+  userId      Int       // Foreign Key
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classroomId Int       // Foreign Key
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  startTime   DateTime
+  endTime     DateTime
+  createdAt   DateTime  @default(now())
+
+  @@map("reservations")
+}

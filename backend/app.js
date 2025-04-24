@@ -1,0 +1,37 @@
+const express = require("express");
+const { info, error } = require("./utils/logger");
+const app = express();
+const cors = require("cors");
+const middleweare  = require('./utils/middleware')
+const userRouter = require('./controllers/users');
+const reservationRouter = require('./controllers/reservations');
+const loginRouter = require("./utils/login");
+
+
+app.use(cors());
+app.use(express.json());
+app.use(middleweare.requestLogger)
+app.use(middleweare.getTokenFrom)
+
+
+
+// app.use(middleweare.unknownEndpoint)
+app.get('/', (req, rep) => {
+  rep.send('<h1> Hello World </h1>')
+})
+
+
+
+//routers
+
+
+// app.use('/api/reservations', middleweare.identifyUser, reservationRouter)
+app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
+
+app.use(middleweare.unknownEndpoint)
+app.use(middleweare.errorHandler)
+
+module.exports = app
+
+
