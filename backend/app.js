@@ -5,7 +5,9 @@ const cors = require("cors");
 const middleweare  = require('./utils/middleware')
 const userRouter = require('./controllers/users');
 const reservationRouter = require('./controllers/reservations');
-const loginRouter = require("./utils/login");
+const loginRouter = require("./controllers/login");
+const signupRouter = require("./controllers/signup");
+const classroomRouter = require("./controllers/classrooms");
 
 
 app.use(cors());
@@ -25,9 +27,11 @@ app.get('/', (req, rep) => {
 //routers
 
 
-// app.use('/api/reservations', middleweare.identifyUser, reservationRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/signup', signupRouter)
+app.use('/api/reservations', reservationRouter)
+app.use('/api/classrooms', classroomRouter)
 
 app.use(middleweare.unknownEndpoint)
 app.use(middleweare.errorHandler)
