@@ -5,9 +5,8 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { identifyUser } = require('../utils/middleware')
 
-signupRouter.post('/', identifyUser, async (req, res) => {
+signupRouter.post('/', async (req, res) => {
   const { username, email, password, role } = req.body;
-	const userRole = req.user.role;
   if (!(username && email && password)) {
     return res.status(400).json({
       error: 'Username, email, and password are required'
@@ -33,10 +32,6 @@ signupRouter.post('/', identifyUser, async (req, res) => {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-	if (role === "REPRESENTATIVE" && userRole !== "ADMIN"){
-      return res.status(403).json({ error:"Can't make a representative without admin privellage"});
-	}
-  
     const newUser = await prisma.user.create({
       data: {
         username,
