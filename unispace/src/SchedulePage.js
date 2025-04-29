@@ -17,45 +17,49 @@ function SchedulePage() {
 
   // Fetch classrooms and reservations on mount
   useEffect(() => {
-    const fetchClassrooms = async () => {
-      try {
-        const response = await fetch('http://localhost:9000/api/classrooms', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setClassrooms(data);
-        } else {
-          throw new Error(data.error || 'Failed to fetch classrooms');
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    const fetchReservations = async () => {
-      try {
-        const response = await fetch('http://localhost:9000/api/reservations', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setReservations(data);
-        } else {
-          throw new Error(data.error || 'Failed to fetch reservations');
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchClassrooms();
-    fetchReservations();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    await fetchClassrooms();
+    await fetchReservations();
+  };
+
+  const fetchClassrooms = async () => {
+    try {
+      const response = await fetch('http://localhost:9000/api/classrooms', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setClassrooms(data);
+      } else {
+        throw new Error(data.error || 'Failed to fetch classrooms');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchReservations = async () => {
+    try {
+      const response = await fetch('http://localhost:9000/api/reservations', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setReservations(data);
+      } else {
+        throw new Error(data.error || 'Failed to fetch reservations');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -71,21 +75,15 @@ function SchedulePage() {
     setError('');
     setSuccess('');
 
-    // Combine date and time for startTime and endTime
-    const [startDate, startTime] = formData.startTime.split('T');
-    const [endDate, endTime] = formData.endTime.split('T');
-    const formattedStartTime = startDate && startTime ? `${startDate}T${startTime}:00Z` : '';
-    const formattedEndTime = endDate && endTime ? `${endDate}T${endTime}:00Z` : '';
-
-    if (!formattedStartTime || !formattedEndTime) {
+    if (!formData.startTime || !formData.endTime) {
       setError('Please provide both start and end times');
       return;
     }
 
     const payload = {
       classroomId: parseInt(formData.classroomId),
-      startTime: formattedStartTime,
-      endTime: formattedEndTime
+      startTime: formData.startTime,
+      endTime: formData.endTime
     };
 
     try {
@@ -104,21 +102,37 @@ function SchedulePage() {
         throw new Error(data.error || 'Reservation failed');
       }
 
-      // Success: Show message and refresh reservations
       setSuccess('Reservation successful!');
       setFormData({ classroomId: '', startTime: '', endTime: '' });
-      // Refresh reservations
-      const reservationsResponse = await fetch('http://localhost:9000/api/reservations', {
+      await fetchReservations();
+    } catch (err) {
+      setError(err.message || 'An error occurred during reservation');
+    }
+  };
+
+  // Handle reservation deletion
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this reservation?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:9000/api/reservations/${id}`, {
+        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      const reservationsData = await reservationsResponse.json();
-      if (reservationsResponse.ok) {
-        setReservations(reservationsData);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete reservation');
       }
+
+      setSuccess('Reservation deleted successfully!');
+      await fetchReservations();
     } catch (err) {
-      setError(err.message || 'An error occurred during reservation');
+      setError(err.message || 'An error occurred during deletion');
     }
   };
 
@@ -126,30 +140,27 @@ function SchedulePage() {
     <div className="App">
       <nav>
         <ul>
-          <li>
-            <Link to="/home">Home</Link>
-          </li>
-          <li>
-            <Link to="/class">Class Status</Link>
-          </li>
-          <li>
-            <Link to="/schedule">Class Queue</Link>
-          </li>
+          <li><Link to="/home">Home</Link></li>
+          <li><Link to="/class">Class Status</Link></li>
+          <li><Link to="/schedule">Class Queue</Link></li>
         </ul>
       </nav>
+
       <div className="card">
         <div className="schedule-container">
           <div className="card-header section">
             <h2>Classroom Reservations</h2>
             <div className="red-square"></div>
           </div>
+
           <div className="class-queue section">
             <h3>Class Queue</h3>
             {reservations.length > 0 ? (
               <ul>
                 {reservations.map((reservation) => (
-                  <li key={reservation.id}>
+                  <li key={reservation.id} className="reservation-item">
                     {reservation.classroom.name}: {new Date(reservation.startTime).toLocaleString()} to {new Date(reservation.endTime).toLocaleString()}
+                    <button className="delete-button" onClick={() => handleDelete(reservation.id)}>Delete</button>
                   </li>
                 ))}
               </ul>
@@ -158,6 +169,7 @@ function SchedulePage() {
             )}
           </div>
         </div>
+
         <div className="reserve-class">
           <h3>Reserve Class</h3>
           <form className="schedule-form" onSubmit={handleSubmit}>
@@ -178,6 +190,7 @@ function SchedulePage() {
                 ))}
               </select>
             </label>
+
             <label>
               From:
               <input
@@ -189,6 +202,7 @@ function SchedulePage() {
                 required
               />
             </label>
+
             <label>
               To:
               <input
@@ -200,6 +214,7 @@ function SchedulePage() {
                 required
               />
             </label>
+
             <button type="submit">Submit</button>
             {error && <p className="error-message">{error}</p>}
             {success && <p className="success-message">{success}</p>}
