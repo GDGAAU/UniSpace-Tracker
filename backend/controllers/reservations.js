@@ -2,7 +2,9 @@ const express = require('express');
 const reservationRouter = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { identifyUser } = require('../utils/middleware');
+const { identifyUser, rbacMiddleware } = require('../utils/middleware');
+const convertReservationsToOccupancies = require('../scripts/convertReservation');
+
 
 reservationRouter.get('/', identifyUser, async (req, res) => {
   const { userId, classroomId, startTime, endTime } = req.query;
@@ -11,14 +13,12 @@ reservationRouter.get('/', identifyUser, async (req, res) => {
 
   try {
     const filters = {};
-    if (userRole !== 'ADMIN' && userRole !== 'Student') {
-      filters.userId = currentUserId; // Representatives only see their own reservations
-    } else if (userId) {
+    if (userId) {
       const parsedUserId = parseInt(userId);
       if (isNaN(parsedUserId)) {
         return res.status(400).json({ error: 'Invalid userId format' });
       }
-      filters.userId = parsedUserId; // Admins can filter by userId
+      filters.userId = parsedUserId; 
     }
 
     
@@ -65,7 +65,7 @@ reservationRouter.get('/', identifyUser, async (req, res) => {
   }
 });
 
-reservationRouter.post('/', identifyUser, async (req, res) => {
+reservationRouter.post('/', identifyUser, rbacMiddleware(['ADMIN', 'REPRESENTATIVE', 'TEACHER']), async (req, res) => {
   const { classroomId, startTime, endTime } = req.body;
   const userId = req.user.id;
   if (!(classroomId && startTime && endTime)) {
@@ -176,7 +176,7 @@ reservationRouter.post('/', identifyUser, async (req, res) => {
   }
 });
 
-reservationRouter.delete('/:id', identifyUser, async (req, res) => {
+reservationRouter.delete('/:id', identifyUser, rbacMiddleware(['ADMIN', 'REPRESENTATIVE', 'TEACHER']), async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
   const userRole = req.user.role;
@@ -222,7 +222,7 @@ reservationRouter.delete('/:id', identifyUser, async (req, res) => {
   }
 });
 
-reservationRouter.patch('/:id', identifyUser, async (req, res) => {
+reservationRouter.patch('/:id', identifyUser, rbacMiddleware(['ADMIN', 'REPRESENTATIVE', 'TEACHER']), async (req, res) => {
     const { id } = req.params;
     const { classroomId, startTime, endTime } = req.body;
     const userId = req.user.id;
@@ -347,6 +347,17 @@ reservationRouter.patch('/:id', identifyUser, async (req, res) => {
       res.status(500).json({ error: 'Internal server error while updating reservation' });
     } finally {
       await prisma.$disconnect();
+    }
+  });
+
+  //manual reservation to occupancy conversion endpoint
+  reservationRouter.post('/convert', identifyUser, rbacMiddleware(['ADMIN', 'REPRESENTATIVE']), async (req, res) => {
+    try {
+      await convertReservationsToOccupancies();
+      res.status(200).json({ message: 'Reservations converted to occupancies successfully' });
+    } catch (error) {
+      console.error('Error converting reservations:', error);
+      res.status(500).json({ error: 'Internal server error during conversion' });
     }
   });
 module.exports = reservationRouter;

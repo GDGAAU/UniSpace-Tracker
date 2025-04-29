@@ -10,65 +10,89 @@ datasource db {
 enum Role {
   STUDENT
   REPRESENTATIVE
-  ADMIN // Added Admin role
+  ADMIN
+  TEACHER
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique
-  email        String        // Added email
-  password     String
-  role         Role          @default(STUDENT)
-  reservations Reservation[]
-  createdAt    DateTime      @default(now()) // Added createdAt
-
+  id             Int            @id @default(autoincrement())
+  username       String         @unique
+  email          String
+  password       String
+  role           Role           @default(STUDENT)
+  reservations   Reservation[]
+  occupancies    Occupancy[]
+  notifications  Notification[]
+  createdAt      DateTime       @default(now())
   @@map("users")
 }
 
 model Building {
-  id         Int          @id @default(autoincrement())
-  name       String
-  floorId    Int          // Foreign Key
-  floor      Floor        @relation(fields: [floorId], references: [id])
-  status     String?      //  Nullable status
-  createdAt  DateTime     @default(now())
-  classrooms Classroom[]
-
+  id          Int        @id @default(autoincrement())
+  name        String
+  floors      Floor[]
+  classrooms  Classroom[]
+  status      String?
+  createdAt   DateTime   @default(now())
   @@map("buildings")
 }
 
 model Floor {
-  id         Int          @id @default(autoincrement())
-  name       String
-  createdAt  DateTime     @default(now())
-  buildings  Building[]
-  classrooms Classroom[]
-
+  id          Int        @id @default(autoincrement())
+  name        String
+  buildingId  Int
+  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  classrooms  Classroom[]
+  createdAt   DateTime   @default(now())
   @@map("floors")
 }
 
 model Classroom {
-  id         Int          @id @default(autoincrement())
-  floorId    Int          // Foreign Key
-  floor      Floor        @relation(fields: [floorId], references: [id])
-  buildingId Int          // Foreign Key
-  building   Building     @relation(fields: [buildingId], references: [id])
-  name       String
-  createdAt  DateTime     @default(now())
+  id          Int         @id @default(autoincrement())
+  floorId     Int
+  floor       Floor       @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  buildingId  Int
+  building    Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime    @default(now())
   reservations Reservation[]
-
+  occupancies  Occupancy[]
   @@map("classrooms")
 }
 
 model Reservation {
-  id          Int       @id @default(autoincrement())
-  userId      Int       // Foreign Key
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  classroomId Int       // Foreign Key
-  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  startTime   DateTime
-  endTime     DateTime
-  createdAt   DateTime  @default(now())
-
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classroomId  Int
+  classroom    Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  startTime    DateTime
+  endTime      DateTime
+  createdAt    DateTime   @default(now())
   @@map("reservations")
+}
+
+model Occupancy {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classroomId  Int
+  classroom    Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  startTime    DateTime
+  endTime      DateTime
+  status       String     @default("occupied")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  @@unique([classroomId, startTime, endTime, userId], name: "Occupancy_unique")
+  @@map("occupancy")
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  @@map("notification")
 }

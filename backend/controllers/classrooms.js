@@ -1,11 +1,11 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { identifyUser, isAdmin } = require('../utils/middleware');
+const { identifyUser, rbacMiddleware } = require('../utils/middleware');
 
 const classroomRouter = express.Router();
 
-// GET /api/classrooms - Fetch all classrooms
+// GET /api/classrooms - Fetch all classrooms -FOR ALL ROLES
 classroomRouter.get('/', identifyUser, async (req, res) => {
   try {
     const classrooms = await prisma.classroom.findMany({
@@ -24,7 +24,8 @@ classroomRouter.get('/', identifyUser, async (req, res) => {
   }
 });
 
-classroomRouter.post('/', identifyUser, isAdmin, async(req, res) => {
+//create classrooms
+classroomRouter.post('/', identifyUser, rbacMiddleware(['ADMIN']), async(req, res) => {
 	const {floorId, buildingId, name } = req.body;
 
 	if (!floorId || !buildingId || !name ) {

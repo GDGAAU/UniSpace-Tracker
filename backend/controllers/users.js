@@ -4,11 +4,11 @@ const { error } = require('../utils/logger')
 const bcrypt = require('bcrypt')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
-const { isAdmin, identifyUser } = require('../utils/middleware')
+const { identifyUser, rbacMiddleware } = require('../utils/middleware')
 
 
 
-userRouter.get('/',identifyUser, isAdmin, async(req, res) => { 
+userRouter.get('/',identifyUser, rbacMiddleware(['ADMIN']), async(req, res) => { 
 	try {
         const users = await prisma.user.findMany();
         res.json(users);
@@ -39,7 +39,7 @@ userRouter.get('/:id', identifyUser, async(req,res) => {
 
 // might implement a way to add new users as an admin maybe?
 
-userRouter.post('/', identifyUser, isAdmin, async(req, res) => {
+userRouter.post('/', rbacMiddleware(['ADMIN']), async(req, res) => {
 	const { username, email, password, role } = req.body;
 	
 	if (!(username && email && password)) {
@@ -86,6 +86,46 @@ userRouter.post('/', identifyUser, isAdmin, async(req, res) => {
 		await prisma.$disconnect();
 	}
 });
+
+
+//Admins can make others admins through this route OR change roles to whatever they like
+userRouter.patch('/:id', identifyUser, rbacMiddleware(['ADMIN']), async (req, res) => {
+	const { id } = req.params;
+	const { role } = req.body;
+  
+	if (!role) {
+	  return res.status(400).json({ error: 'Role is required' });
+	}
+	if (!['STUDENT', 'TEACHER', 'REPRESENTATIVE', 'ADMIN'].includes(role)) {
+	  return res.status(400).json({ error: 'Invalid role' });
+	}
+  
+	try {
+	  const user = await prisma.user.findUnique({
+		where: { id: parseInt(id) },
+	  });
+	  if (!user) {
+		return res.status(404).json({ error: 'User not found' });
+	  }
+  
+	  const updatedUser = await prisma.user.update({
+		where: { id: parseInt(id) },
+		data: { role },
+	  });
+  
+	  res.status(200).json({
+		id: updatedUser.id,
+		username: updatedUser.username,
+		email: updatedUser.email,
+		role: updatedUser.role,
+	  });
+	} catch (error) {
+	  console.error('Error updating user role:', error);
+	  res.status(500).json({ error: 'Internal server error during role update' });
+	} finally {
+	  await prisma.$disconnect();
+	}
+  });
 
 
 module.exports = userRouter;

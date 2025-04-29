@@ -57,21 +57,6 @@ const identifyUser = async (req, res, next) => {
   }
 };
 
-const isRep = (req, res, next) => {
-  if (req.user && req.user.role === 'REPRESENTATIVE') {
-    next();
-  } else {
-    return res.status(403).json({ error: 'Forbidden - Representatives only.' });
-  }
-};
-
-const isAdmin = (req, res, next) => {
-	if(req.user && req.user.role === 'ADMIN'){
-		next();
-	}else{
-		return(res.status(403).json({ error: 'Forbidden - Admin Only.' }))
-	}
-}
 
 
 const errorHandler = (error, request, response, next) => {
@@ -90,16 +75,31 @@ const errorHandler = (error, request, response, next) => {
       error: 'inivalid token'
     }))
   }
-
-
   next(error)
-}
+};
+
+const rbacMiddleware = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ error: 'Unauthorized - User not authenticated' });
+    }
+
+    const userRole = req.user.role;
+
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ error: `Forbidden - ${userRole} role not authorized` });
+    }
+
+    next();
+  };
+};
+
+
 module.exports = {
 	requestLogger,
 	getTokenFrom,
 	unknownEndpoint,
 	identifyUser,
 	errorHandler,
-	isRep,
-	isAdmin
+	rbacMiddleware
 }
