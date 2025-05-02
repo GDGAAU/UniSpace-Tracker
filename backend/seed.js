@@ -50,7 +50,6 @@ async function main() {
     },
   });
 
-  // Create Floors and Buildings
   const floor1 = await prisma.floor.create({
     data: {
       name: '1st Floor',
@@ -77,7 +76,7 @@ async function main() {
     include: { building: true },
   });
 
-  // Create Classrooms
+
   const classroom101 = await prisma.classroom.create({
     data: {
       name: 'Room 101',
@@ -139,7 +138,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Seed failed:', e);
+    console.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {

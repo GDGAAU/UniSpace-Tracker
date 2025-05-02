@@ -15,84 +15,108 @@ enum Role {
 }
 
 model User {
-  id             Int            @id @default(autoincrement())
-  username       String         @unique
-  email          String
-  password       String
-  role           Role           @default(STUDENT)
-  reservations   Reservation[]
-  occupancies    Occupancy[]
-  notifications  Notification[]
-  createdAt      DateTime       @default(now())
-  @@map("users")
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  email         String         @unique
+  password      String
+  role          Role           @default(STUDENT)
+  createdAt     DateTime       @default(now())
+  profiles      Profile[]
+  reservations  Reservation[]
+  occupancies   Occupancy[]
+  notifications Notification[]
 }
 
 model Building {
-  id          Int        @id @default(autoincrement())
-  name        String
-  floors      Floor[]
-  classrooms  Classroom[]
-  status      String?
-  createdAt   DateTime   @default(now())
+  id         Int         @id @default(autoincrement())
+  name       String
+  floors     Floor[]
+  classrooms Classroom[]
+  status     String?
+  createdAt  DateTime    @default(now())
+
   @@map("buildings")
 }
 
 model Floor {
-  id          Int        @id @default(autoincrement())
-  name        String
-  buildingId  Int
-  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  classrooms  Classroom[]
-  createdAt   DateTime   @default(now())
+  id         Int         @id @default(autoincrement())
+  name       String
+  buildingId Int
+  building   Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  classrooms Classroom[]
+  createdAt  DateTime    @default(now())
+
   @@map("floors")
 }
 
 model Classroom {
-  id          Int         @id @default(autoincrement())
-  floorId     Int
-  floor       Floor       @relation(fields: [floorId], references: [id], onDelete: Cascade)
-  buildingId  Int
-  building    Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  name        String
-  createdAt   DateTime    @default(now())
+  id           Int           @id @default(autoincrement())
+  floorId      Int
+  floor        Floor         @relation(fields: [floorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  buildingId   Int
+  building     Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  name         String
+  createdAt    DateTime      @default(now())
   reservations Reservation[]
   occupancies  Occupancy[]
+
   @@map("classrooms")
 }
 
 model Reservation {
-  id           Int        @id @default(autoincrement())
-  userId       Int
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  classroomId  Int
-  classroom    Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  startTime    DateTime
-  endTime      DateTime
-  createdAt    DateTime   @default(now())
-  @@map("reservations")
+  id            Int            @id @default(autoincrement())
+  userId        Int
+  classroomId   Int
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  classroom     Classroom      @relation(fields: [classroomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  startTime     DateTime
+  endTime       DateTime
+  createdAt     DateTime       @default(now())
+  notifications Notification[]
 }
 
 model Occupancy {
-  id           Int        @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   userId       Int
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   classroomId  Int
-  classroom    Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  classroom    Classroom      @relation(fields: [classroomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   startTime    DateTime
   endTime      DateTime
-  status       String     @default("occupied")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  status       String         @default("occupied")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  notification Notification[]
+
   @@unique([classroomId, startTime, endTime, userId], name: "Occupancy_unique")
   @@map("occupancy")
 }
 
 model Notification {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  message    String
-  isRead     Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reservationId Int?
+  reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  message       String
+  type          String       @default("INFO")
+  isRead        Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  occupancy     Occupancy    @relation(fields: [occupancyId], references: [id])
+  occupancyId   Int
+
   @@map("notification")
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  firstName String
+  lastName  String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+
+  @@map("profile")
 }

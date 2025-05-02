@@ -14,6 +14,7 @@ const { notificationRouter } = require("./controllers/notification");
 
 
 const {Server} = require("socket.io");
+const profileRouter = require("./controllers/profile");
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -46,6 +47,7 @@ app.use('/api/reservations', reservationRouter)
 app.use('/api/classrooms', classroomRouter)
 app.use('/api/occupancy', occupancyRouter)
 app.use('/api/notifications', notificationRouter)
+app.use('/api/profiles', profileRouter)
 
 
 io.on('connection', (socket) => {
