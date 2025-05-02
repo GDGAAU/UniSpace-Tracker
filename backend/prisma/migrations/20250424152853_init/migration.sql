@@ -7,8 +7,9 @@ DROP TABLE IF EXISTS "notification" CASCADE;
 DROP TABLE IF EXISTS "occupancy" CASCADE;
 DROP TABLE IF EXISTS "reservations" CASCADE;
 DROP TABLE IF EXISTS "classrooms" CASCADE;
-DROP TABLE IF EXISTS "buildings" CASCADE;
 DROP TABLE IF EXISTS "floors" CASCADE;
+DROP TABLE IF EXISTS "buildings" CASCADE;
+DROP TABLE IF EXISTS "profile" CASCADE;
 DROP TABLE IF EXISTS "users" CASCADE;
 
 -- CreateTable: users
@@ -79,14 +80,29 @@ CREATE TABLE "occupancy" (
 CREATE TABLE "notification" (
   "id" SERIAL NOT NULL,
   "userId" INTEGER NOT NULL,
+  "reservationId" INTEGER,
   "message" TEXT NOT NULL,
+  "type" TEXT NOT NULL DEFAULT 'INFO',
   "isRead" BOOLEAN NOT NULL DEFAULT false,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
 );
 
--- Create Index
+-- CreateTable: profile
+CREATE TABLE "profile" (
+  "id" SERIAL NOT NULL,
+  "userId" INTEGER NOT NULL,
+  "firstName" TEXT NOT NULL,
+  "lastName" TEXT NOT NULL,
+  "phone" TEXT,
+  "address" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "profile_pkey" PRIMARY KEY ("id")
+);
+
+-- Create Indexes
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- Add Foreign Keys
 ALTER TABLE "floors"
@@ -119,4 +135,12 @@ FOREIGN KEY ("classroomId") REFERENCES "classrooms"("id") ON DELETE CASCADE ON U
 
 ALTER TABLE "notification"
 ADD CONSTRAINT "notification_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "notification"
+ADD CONSTRAINT "notification_reservationId_fkey"
+FOREIGN KEY ("reservationId") REFERENCES "reservations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "profile"
+ADD CONSTRAINT "profile_userId_fkey"
 FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
