@@ -1,0 +1,36 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+.sideContainer{
+    width: 300px;
+    height: 924px;
+     background: linear-gradient(to bottom, #4F46E5, #2C277F);
+     color: white; 
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.strightline{
+    border-top: 2px solid white; 
+    width: 100%; 
+    margin-top: 40px;
+}
+.dashboard{
+    display: flex;
+    margin:40px;
+    margin-bottom: 5px;
+    margin-left: 50px;
+}
+.link-hold{
+    margin-top:100px;
+    margin-bottom: 200px;
+}
+
+.links{
+    display: flex;
+    margin-left: 50px;
+    margin-bottom: 20px;
+    margin-top:20px;
+}
