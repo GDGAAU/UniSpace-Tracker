@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Inter;
+
+}
+.page_title{
+    color: #000;
+    font-size: 36px;
+    font-weight: 700;
+    margin-top: 80px;
+    margin-left: 120px;
+}
+.intro{
+    background-color: #4F46E5;
+    height: 377px;
+    margin-top: 40px;
+
+   
+}
+.intro_text{
+    color: #FFF;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 50px;
+    padding: 40px 80px 0px 80px;
+}
+.intro_subtext{
+    color: #FFF;
+    font-size: 16px;
+    font-weight: 200;
+    padding: 40px 80px 0px 80px;
+
+
+}
+
+.buttons{
+    display: flex;
+    gap:20px;
+    margin-top: 40px;
+    margin-left: 100px;
+   
+}
+.signup{
+    width: 200px;
+    height: 50px;
+    border-radius: 5px;
+    background: #FFF;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #4F46E5;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+ }
+ .signup:hover{
+    background: #4F46E5;
+    color: #FFF;
+    transition: all 0.3s ease;
+    border: 3px solid #FFF;
+}
+.login{
+    width: 200px;
+    height: 50px;
+    border-radius: 5px;
+    border: 3px solid #FFF;
+    background: #4F46E5;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+.login:hover{
+    background: #FFF;
+    color: #4F46E5;
+    transition: all 0.3s ease;
+}
+.students{
+    width: 312px;
+    height: 312px;
+aspect-ratio: 1/1;
+position: absolute;
+left: 950px;
+top: 190px;
+
+}
+.feature_text{
+    color: #000;
+text-align: center;
+font-size: 36px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+margin-top: 70px;
+}
+.feature_subtext{
+    color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.card_container{
+    display: flex;
+    gap: 30px;
+    margin-top: 80px;
+    margin-left: 120px;
+    
+
+}
+.card_name{
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-left: 30px;
+
+}
+.card_text{
+    width: 300px;
+    font-size: 16px;
+    margin-left: 30px;
+    margin-top: 35px;
+}
+.card_list{
+    font-size:16px;
+    list-style: none;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+.card{
+    width: 365px;
+height: 440px;
+border-radius: 5px;
+background: #F9F7F7;
+box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+.card:hover{
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+.icons{
+    height: 50px;
+    width: 50px;
+    margin-top: 30px;
+    margin-left: 30px;
+}
+
+.section3{
+    background: #F9F7F7;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    margin-top: 130px;
+    height: 600px;
+    padding-top:70px ;
+    margin-bottom: 60px;
+ 
+
+}
+.manual_text{
+     color: #000;
+text-align: center;
+font-size: 36px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+
+
+}
+.manual_subtext{
+   color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 20px;
+}
+.steps{
+    display: flex;
+    gap: 100px;
+    margin-top: 80px;
+    margin-left: 250px;
+
+}
+.number{
+margin-left:60px ;  
+}
+.step{
+   
+color: #000;
+text-align: center;
+font-family: Inter;
+font-size: 20px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+margin-top: 30px;
+margin-left: -50px;
+    
+
+}
+.description{
+    width: 300px;
+   color: #5A5858;
+text-align: center;
+font-family: Inter;
+font-size: 16px;
+font-weight: 500;
+margin-left: -50px;
+margin-top: 20px;
+}
+
+.get_started{
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    background: #4F46E5;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    border:none;
+    color: #FFF;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+.get_started:hover{
+    background: #FFF;
+    color: #4F46E5;
+    transition: all 0.3s ease;
+    border: 3px solid #4F46E5;
+}
